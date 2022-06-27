@@ -1,9 +1,12 @@
 
 <a href="/logout">ログアウト</a>
-
+<div>今日の勉強時間{{ $hours_today }}</div>
+<div>今月の勉強時間{{ $hours_month=1 }}</div>
+<div>合計の勉強時間{{ $hours_total=1 }}</div>
 <?php
-dd('webapp');
-session_start();
+dd($hours_today);
+dd($study_data);
+// session_start();
 // require_once "function.php";
 // var_dump($_SESSION['user']);//NULLになってる
 

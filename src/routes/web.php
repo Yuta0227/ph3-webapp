@@ -23,7 +23,4 @@ Auth::routes();
 
 Route::get('/home', 'HomeController@index')->name('home');
 Route::get('/webapp','WebappController@index')->name('webapp');
-Route::get('/logout',function(){
-    Auth::logout();
-    return view('welcome');
-});
+Route::get('/logout','WebappController@logout');

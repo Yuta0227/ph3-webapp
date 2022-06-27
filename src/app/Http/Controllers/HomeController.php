@@ -26,8 +26,8 @@ class HomeController extends Controller
     public function index()
     {
         $user=Auth::user();  
+        session(['user'=>$user]);
         if($user->admin_bool==1){
-
             return view('home',compact('user'));
         }else{
             return redirect()->action('WebappController@index');
