@@ -24,3 +24,4 @@ Auth::routes();
 Route::get('/home', 'HomeController@index')->name('home');
 Route::get('/webapp','WebappController@index')->name('webapp');
 Route::get('/logout','WebappController@logout');
+Route::post('/month','WebappController@month');

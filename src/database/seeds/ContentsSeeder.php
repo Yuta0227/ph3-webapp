@@ -14,9 +14,9 @@ class ContentsSeeder extends Seeder
     public function run()
     {
         $param=[
-            ['content'=>'POSSE課題'],
-            ['content'=>'ドットインストール'],
-            ['content'=>'N予備校'],
+            ['color_code'=>'#0345EC','content'=>'POSSE課題'],
+            ['color_code'=>'#0F71BD','content'=>'ドットインストール'],
+            ['color_code'=>'#20BDDE','content'=>'N予備校'],
         ];
         DB::table('contents')->insert($param);
     }

@@ -16,6 +16,7 @@ class Languages extends Migration
         Schema::create('languages',function(Blueprint $table){
             $table->increments('id');
             $table->string('language');
+            $table->string('color_code');
         });
     }
 

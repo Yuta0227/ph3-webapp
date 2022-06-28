@@ -1,147 +1,136 @@
-
 <a href="/logout">ログアウト</a>
-<div>今日の勉強時間{{ $hours_today }}</div>
-<div>今月の勉強時間{{ $hours_month }}</div>
-<div>合計の勉強時間{{ $hours_total }}</div>
+
+<div style="display:flex;">
+    @foreach ($bargraph_data as $data)
+        <div style="border:1px solid black;">{{ $data }}</div>
+    @endforeach
+</div>
+
 <?php
-dd($hours_today);
-dd($study_data);
+// dd($hours_today);
+// dd($study_data);
 // session_start();
 // require_once "function.php";
 // var_dump($_SESSION['user']);//NULLになってる
 
-start_timer();
+// start_timer();
 // print_r('<pre>');
 // var_dump($_SESSION);
 // print_r('</pre>');
 // require "db-connect.php";
-$user = $_SESSION['user'];
-$moveMonth = $_GET['month'];
-$moveYear = $_GET['year'];
-$submit_date = '';
-$check->check_login();
-$post->reset_time();
-//slack投稿日時
-if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-    $check->check_expire();
-    $post->set_time();
-    $post->delete_sql();
-    $post->set_date_array();
-    $post->set_contents_array();
-    $post->set_language();
-    $post->set_hours();
-    $post->insert_data();
-};
+// $user = $_SESSION['user'];
+// $moveMonth = $_GET['month'];
+// $moveYear = $_GET['year'];
+// $submit_date = '';
+// $check->check_login();
+// $post->reset_time();
+// //slack投稿日時
+// if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+//     $check->check_expire();
+//     $post->set_time();
+//     $post->delete_sql();
+//     $post->set_date_array();
+//     $post->set_contents_array();
+//     $post->set_language();
+//     $post->set_hours();
+//     $post->insert_data();
+// }
 ?>
 <?php
 //最初は現在日程のテーブル表示
 //下の方でクリック時$date$month$yearを増減しurlを再度読み込む
-$time = new DateTime();
-$date = (int)date('d');
-$month = (int)date('n');
-$year = (int)date('Y');
-if (isset($_GET['month']) && isset($_GET['year']) && $moveMonth <= 12) {
-    $stmt2 = $dbh->prepare("SELECT sum(hours) from time where month = $moveMonth AND year = $moveYear and user_id =?;"); //該当月
-} else {
-    $stmt2 = $dbh->prepare("SELECT sum(hours) from time where month =$month and year = $year and user_id= ?;");
-};
+// $time = new DateTime();
+// $date = (int) date('d');
+// $month = (int) date('n');
+// $year = (int) date('Y');
+// if (isset($_GET['month']) && isset($_GET['year']) && $moveMonth <= 12) {
+//     $stmt2 = $dbh->prepare("SELECT sum(hours) from time where month = $moveMonth AND year = $moveYear and user_id =?;"); //該当月
+// } else {
+//     $stmt2 = $dbh->prepare("SELECT sum(hours) from time where month =$month and year = $year and user_id= ?;");
+// }
 ?>
 <?php
 // echo $date;
 // echo $date;
-$stmt1 = $dbh->prepare("SELECT sum(hours) from time where date = $date AND month = $month AND year = $year AND user_id = ?;"); //today専用
-$stmt3 = $dbh->prepare("SELECT sum(hours) from time where user_id=?;"); //合計
-$stmt4 = $dbh->prepare("SELECT sum(hours) from time where content_id=1 and user_id=?;");
-$stmt5 = $dbh->prepare("SELECT sum(hours) from time where content_id=2 and user_id=?;");
-$stmt6 = $dbh->prepare("SELECT sum(hours) from time where content_id=3 and user_id=?;");
-$stmt7 = $dbh->prepare("SELECT sum(hours) from time where language_id=1 and user_id=?;");
-$stmt8 = $dbh->prepare("SELECT sum(hours) from time where language_id=2 and user_id=?;");
-$stmt9 = $dbh->prepare("SELECT sum(hours) from time where language_id=3 and user_id=?;");
-$stmt10 = $dbh->prepare("SELECT sum(hours) from time where language_id=4 and user_id=?;");
-$stmt11 = $dbh->prepare("SELECT sum(hours) from time where language_id=5 and user_id=?;");
-$stmt12 = $dbh->prepare("SELECT sum(hours) from time where language_id=6 and user_id=?;");
-$stmt13 = $dbh->prepare("SELECT sum(hours) from time where language_id=7 and user_id=?;");
-$stmt14 = $dbh->prepare("SELECT sum(hours) from time where language_id=8 and user_id=?;");
-$content4 = $dbh->prepare("SELECT distinct content from time where content_id=1 and user_id=?;"); //1=>POSSE課題
-$content5 = $dbh->prepare("SELECT distinct content from time where content_id=2 and user_id=?;"); //2=>ドットインストール
-$content6 = $dbh->prepare("SELECT distinct content from time where content_id=3 and user_id=?;"); //3=>N予備校
-$language7 = $dbh->prepare("SELECT distinct language from time where language_id=1 and user_id= ?;"); //1=>Javascript
-$language8 = $dbh->prepare("SELECT distinct language from time where language_id=2 and user_id= ?;"); //2=>CSS
-$language9 = $dbh->prepare("SELECT distinct language from time where language_id=3 and user_id= ?;"); //3=>PHP
-$language10 = $dbh->prepare("SELECT distinct language from time where language_id=4 and user_id= ?;"); //4=>HTML
-$language11 = $dbh->prepare("SELECT distinct language from time where language_id=5 and user_id= ?;"); //5=>Laravel
-$language12 = $dbh->prepare("SELECT distinct language from time where language_id=6 and user_id= ?;"); //6=>SQL
-$language13 = $dbh->prepare("SELECT distinct language from time where language_id=7 and user_id= ?;"); //7=>SHELL
-$language14 = $dbh->prepare("SELECT distinct language from time where language_id=8 and user_id= ?;"); //8=>情報システム基礎知識(その他)
-$show_delete_stmt = $dbh->prepare("SELECT * from time where user_id= ? order by id desc limit 5;"); //過去５件表示
-$show_delete_stmt->bindValue(1, $user[0]['user_id']);
-$show_delete_stmt->execute();
-$show_delete_data = $show_delete_stmt->fetchAll();
-$delete_request_id_stmt = $dbh->prepare("SELECT delete_id from delete_request where user_id= ?;");
-$delete_request_id_stmt->bindValue(1, $user[0]['user_id']);
-$delete_request_id_data = $delete_request_id_stmt->fetchAll();
+// $stmt1 = $dbh->prepare("SELECT sum(hours) from time where date = $date AND month = $month AND year = $year AND user_id = ?;"); //today専用
+// $stmt3 = $dbh->prepare('SELECT sum(hours) from time where user_id=?;'); //合計
+// $stmt4 = $dbh->prepare('SELECT sum(hours) from time where content_id=1 and user_id=?;');
+// $stmt5 = $dbh->prepare('SELECT sum(hours) from time where content_id=2 and user_id=?;');
+// $stmt6 = $dbh->prepare('SELECT sum(hours) from time where content_id=3 and user_id=?;');
+// $stmt7 = $dbh->prepare('SELECT sum(hours) from time where language_id=1 and user_id=?;');
+// $stmt8 = $dbh->prepare('SELECT sum(hours) from time where language_id=2 and user_id=?;');
+// $stmt9 = $dbh->prepare('SELECT sum(hours) from time where language_id=3 and user_id=?;');
+// $stmt10 = $dbh->prepare('SELECT sum(hours) from time where language_id=4 and user_id=?;');
+// $stmt11 = $dbh->prepare('SELECT sum(hours) from time where language_id=5 and user_id=?;');
+// $stmt12 = $dbh->prepare('SELECT sum(hours) from time where language_id=6 and user_id=?;');
+// $stmt13 = $dbh->prepare('SELECT sum(hours) from time where language_id=7 and user_id=?;');
+// $stmt14 = $dbh->prepare('SELECT sum(hours) from time where language_id=8 and user_id=?;');
+// $content4 = $dbh->prepare('SELECT distinct content from time where content_id=1 and user_id=?;'); //1=>POSSE課題
+// $content5 = $dbh->prepare('SELECT distinct content from time where content_id=2 and user_id=?;'); //2=>ドットインストール
+// $content6 = $dbh->prepare('SELECT distinct content from time where content_id=3 and user_id=?;'); //3=>N予備校
+// $language7 = $dbh->prepare('SELECT distinct language from time where language_id=1 and user_id= ?;'); //1=>Javascript
+// $language8 = $dbh->prepare('SELECT distinct language from time where language_id=2 and user_id= ?;'); //2=>CSS
+// $language9 = $dbh->prepare('SELECT distinct language from time where language_id=3 and user_id= ?;'); //3=>PHP
+// $language10 = $dbh->prepare('SELECT distinct language from time where language_id=4 and user_id= ?;'); //4=>HTML
+// $language11 = $dbh->prepare('SELECT distinct language from time where language_id=5 and user_id= ?;'); //5=>Laravel
+// $language12 = $dbh->prepare('SELECT distinct language from time where language_id=6 and user_id= ?;'); //6=>SQL
+// $language13 = $dbh->prepare('SELECT distinct language from time where language_id=7 and user_id= ?;'); //7=>SHELL
+// $language14 = $dbh->prepare('SELECT distinct language from time where language_id=8 and user_id= ?;'); //8=>情報システム基礎知識(その他)
+// $show_delete_stmt = $dbh->prepare('SELECT * from time where user_id= ? order by id desc limit 5;'); //過去５件表示
+// $show_delete_stmt->bindValue(1, $user[0]['user_id']);
+// $show_delete_stmt->execute();
+// $show_delete_data = $show_delete_stmt->fetchAll();
+// $delete_request_id_stmt = $dbh->prepare('SELECT delete_id from delete_request where user_id= ?;');
+// $delete_request_id_stmt->bindValue(1, $user[0]['user_id']);
+// $delete_request_id_data = $delete_request_id_stmt->fetchAll();
 
-for ($i = 1; $i <= 14; $i++) {
-    ${"stmt" . $i}->bindValue(1, $user[0]['user_id']);
-    ${"stmt" . $i}->execute();
-    ${"data" . $i} = ${"stmt" . $i}->fetchAll();
-}
-for ($g = 4; $g <= 6; $g++) {
-    ${"content" . $g}->bindValue(1, $user[0]['user_id']);
-    ${"content" . $g}->execute();
-    ${"content_data" . $g} = ${"content" . $g}->fetchAll();
-}
-for ($h = 7; $h <= 14; $h++) {
-    ${"language" . $h}->bindValue(1, $user[0]['user_id']);
-    ${"language" . $h}->execute();
-    ${"language_data" . $h} = ${"language" . $h}->fetchAll();
-}
-for ($a = 1; $a <= 14; $a++) {
-    if (${"data" . $a}[0]['sum(hours)'] == NULL) {
-        ${"data" . $a}[0]['sum(hours)'] = 0;
-    }
-}
-$content_array = [
-    ['合計時間' => (int)$data4[0]['sum(hours)'], 'コンテンツ' => $content_data4[0]['content']],
-    ['合計時間' => (int)$data5[0]['sum(hours)'], 'コンテンツ' => $content_data5[0]['content']],
-    ['合計時間' => (int)$data6[0]['sum(hours)'], 'コンテンツ' => $content_data6[0]['content']],
-];
-foreach ($content_array as $key => $value) {
-    $multi_content_array[$key] = $value['合計時間'];
-};
-array_multisort($multi_content_array, SORT_DESC, SORT_NUMERIC, $content_array);
-$language_array = [
-    ['合計時間' => (int)$data7[0]['sum(hours)'], '言語' => $language_data7[0]['language']],
-    ['合計時間' => (int)$data8[0]['sum(hours)'], '言語' => $language_data8[0]['language']],
-    ['合計時間' => (int)$data9[0]['sum(hours)'], '言語' => $language_data9[0]['language']],
-    ['合計時間' => (int)$data10[0]['sum(hours)'], '言語' => $language_data10[0]['language']],
-    ['合計時間' => (int)$data11[0]['sum(hours)'], '言語' => $language_data11[0]['language']],
-    ['合計時間' => (int)$data12[0]['sum(hours)'], '言語' => $language_data12[0]['language']],
-    ['合計時間' => (int)$data13[0]['sum(hours)'], '言語' => $language_data13[0]['language']],
-    ['合計時間' => (int)$data14[0]['sum(hours)'], '言語' => $language_data14[0]['language']],
-];
-foreach ($language_array as $key => $value) {
-    $multi_language_array[$key] = $value['合計時間'];
-};
-array_multisort($multi_language_array, SORT_DESC, SORT_NUMERIC, $language_array);
-//連想配列で数値と言語名も取れると最高
-$date_array = [];
-for ($j = 1; $j <= date('t'); $j++) {
-    if (isset($_GET['month']) && isset($_GET['year']) && $moveMonth <= 12) {
-        ${"date_stmt" . $j} = $dbh->prepare("SELECT sum(hours) from time where date = $j and month = $moveMonth and year= $moveYear and user_id=?;"); //日付の合計時間
-    } else {
-        ${"date_stmt" . $j} = $dbh->prepare("SELECT sum(hours) from time where date = $j and month = $month and year= $year and user_id=?;"); //日付の合計時間
-    }
-    ${"date_stmt" . $j}->bindValue(1, $user[0]['user_id']);
-    ${"date_stmt" . $j}->execute();
-    ${"date_data" . $j} = ${"date_stmt" . $j}->fetchAll();
-    ${"date_data" . $j}[0]['sum(hours)'] = ${"date_data" . $j}[0]['sum(hours)'] - 0;
-    if (${"date_data" . $j}[0]['sum(hours)'] == NULL) {
-        ${"date_data" . $j}[0]['sum(hours)'] = 0;
-    };
-    array_push($date_array, ${"date_data" . $j}[0]["sum(hours)"]);
-};
-
+// for ($i = 1; $i <= 14; $i++) {
+//     ${'stmt' . $i}->bindValue(1, $user[0]['user_id']);
+//     ${'stmt' . $i}->execute();
+//     ${'data' . $i} = ${'stmt' . $i}->fetchAll();
+// }
+// for ($g = 4; $g <= 6; $g++) {
+//     ${'content' . $g}->bindValue(1, $user[0]['user_id']);
+//     ${'content' . $g}->execute();
+//     ${'content_data' . $g} = ${'content' . $g}->fetchAll();
+// }
+// for ($h = 7; $h <= 14; $h++) {
+//     ${'language' . $h}->bindValue(1, $user[0]['user_id']);
+//     ${'language' . $h}->execute();
+//     ${'language_data' . $h} = ${'language' . $h}->fetchAll();
+// }
+// for ($a = 1; $a <= 14; $a++) {
+//     if (${'data' . $a}[0]['sum(hours)'] == null) {
+//         ${'data' . $a}[0]['sum(hours)'] = 0;
+//     }
+// }
+// $content_array = [['合計時間' => (int) $data4[0]['sum(hours)'], 'コンテンツ' => $content_data4[0]['content']], ['合計時間' => (int) $data5[0]['sum(hours)'], 'コンテンツ' => $content_data5[0]['content']], ['合計時間' => (int) $data6[0]['sum(hours)'], 'コンテンツ' => $content_data6[0]['content']]];
+// foreach ($content_array as $key => $value) {
+//     $multi_content_array[$key] = $value['合計時間'];
+// }
+// array_multisort($multi_content_array, SORT_DESC, SORT_NUMERIC, $content_array);
+// $language_array = [['合計時間' => (int) $data7[0]['sum(hours)'], '言語' => $language_data7[0]['language']], ['合計時間' => (int) $data8[0]['sum(hours)'], '言語' => $language_data8[0]['language']], ['合計時間' => (int) $data9[0]['sum(hours)'], '言語' => $language_data9[0]['language']], ['合計時間' => (int) $data10[0]['sum(hours)'], '言語' => $language_data10[0]['language']], ['合計時間' => (int) $data11[0]['sum(hours)'], '言語' => $language_data11[0]['language']], ['合計時間' => (int) $data12[0]['sum(hours)'], '言語' => $language_data12[0]['language']], ['合計時間' => (int) $data13[0]['sum(hours)'], '言語' => $language_data13[0]['language']], ['合計時間' => (int) $data14[0]['sum(hours)'], '言語' => $language_data14[0]['language']]];
+// foreach ($language_array as $key => $value) {
+//     $multi_language_array[$key] = $value['合計時間'];
+// }
+// array_multisort($multi_language_array, SORT_DESC, SORT_NUMERIC, $language_array);
+// //連想配列で数値と言語名も取れると最高
+// $date_array = [];
+// for ($j = 1; $j <= date('t'); $j++) {
+//     if (isset($_GET['month']) && isset($_GET['year']) && $moveMonth <= 12) {
+//         ${'date_stmt' . $j} = $dbh->prepare("SELECT sum(hours) from time where date = $j and month = $moveMonth and year= $moveYear and user_id=?;"); //日付の合計時間
+//     } else {
+//         ${'date_stmt' . $j} = $dbh->prepare("SELECT sum(hours) from time where date = $j and month = $month and year= $year and user_id=?;"); //日付の合計時間
+//     }
+//     ${'date_stmt' . $j}->bindValue(1, $user[0]['user_id']);
+//     ${'date_stmt' . $j}->execute();
+//     ${'date_data' . $j} = ${'date_stmt' . $j}->fetchAll();
+//     ${'date_data' . $j}[0]['sum(hours)'] = ${'date_data' . $j}[0]['sum(hours)'] - 0;
+//     if (${'date_data' . $j}[0]['sum(hours)'] == null) {
+//         ${'date_data' . $j}[0]['sum(hours)'] = 0;
+//     }
+//     array_push($date_array, ${'date_data' . $j}[0]['sum(hours)']);
+// }
 ?>
 <!DOCTYPE html>
 <html lang="ja">
@@ -151,9 +140,9 @@ for ($j = 1; $j <= date('t'); $j++) {
     <meta charset="UTF-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="stylesheet" href="./reset.css">
-    <link rel="stylesheet" type="text/css" href="./webapp.css?v=<?= date('s') ?>">
-    <title>Document</title>
+    <link rel="stylesheet" href="{{ asset('css/reset.css') }}">
+    <link rel="stylesheet" type="text/css" href="{{ asset('css/webapp.css') }}">
+    <title>Webapp</title>
     <link href="https://use.fontawesome.com/releases/v5.6.1/css/all.css" rel="stylesheet">
 </head>
 
@@ -162,16 +151,17 @@ for ($j = 1; $j <= date('t'); $j++) {
     <header>
         <div class="logo-week">
             <img src="./img/posse_logo.png" alt="posseのロゴ" class="logo">
-            <span class="week"><?php echo return_week().'週目の'.$user[0]['user_name'].'さんの勉強時間'; ?>
+            <span class="week">{{ $week_number . '週目の' . session()->get('user')->name . 'さんの勉強時間' }}
             </span>
         </div>
+        {{-- <div><a href="/logout">ログアウト</a></div> --}}
         <select name="buttons" class="button-container">
             <option id="header-logout-button" class="post-button">ログアウト</option>
             <option id="header-delete-button" class="post-button">削除依頼</option>
             <option id="header-post-button" class="post-button">記録・投稿</option>
         </select>
         <div style="align-items:center;display:flex;justify-content:center;padding-right:20px;">
-            <input type="button" value="確定" id="decide-button"></input>
+            <input type="button" value="確定" id="decide-button">
         </div>
     </header>
     <div class="content-container">
@@ -179,30 +169,25 @@ for ($j = 1; $j <= date('t'); $j++) {
         <div class="first-container">
             <div class="today-month-total-container">
                 <div class="today-container">
-                    <div class="today"><?php echo $year; ?>/<?php echo $month; ?>/<?php echo $date; ?></div>
+                    <div class="today">
+                        {{ session()->get('year') }}/{{ session()->get('month') }}/{{ date('d') }}</div>
                     <div class="number">
-                        <?php echo (int)$data1[0]['sum(hours)']; ?>
+                        {{ $hours_today }}
                     </div>
                     <div class="hour">時間</div>
                 </div>
                 <div class="month-container">
-                    <div class="month">
-                        <?php echo $year; ?>/<?php
-                                                if (isset($_GET['month']) && isset($_GET['year']) && $moveMonth <= 12) {
-                                                    echo $moveMonth;
-                                                } else {
-                                                    echo $month;
-                                                }; ?>
+                    <div class="month">{{ session()->get('year') . '/' . session()->get('month') }}
                     </div>
                     <div class="number">
-                        <?php echo (int)$data2[0]['sum(hours)']; ?>
+                        {{ $hours_month }}
                     </div>
                     <div class="hour">時間</div>
                 </div>
                 <div class="total-container">
                     <div class="total">合計</div>
                     <div class="number">
-                        <?php echo (int)$data3[0]['sum(hours)']; ?>
+                        {{ $hours_total }}
                     </div>
                     <div class="hour">時間</div>
                 </div>
@@ -218,14 +203,12 @@ for ($j = 1; $j <= date('t'); $j++) {
                 <canvas id="language-chart-doughnut" width="15" height="10"></canvas>
                 <div>
                     <ul class="language">
-                        <li><i class="fas fa-circle" style="color:#0345EC"></i><?php echo $language_array[0]['言語']; ?></li>
-                        <li><i class="fas fa-circle" style="color:#0F71BD"></i><?php echo $language_array[1]['言語']; ?></li>
-                        <li><i class="fas fa-circle" style="color:#20BDDE"></i><?php echo $language_array[2]['言語']; ?></li>
-                        <li><i class="fas fa-circle" style="color:#3CCEFE"></i><?php echo $language_array[3]['言語']; ?></li>
-                        <li><i class="fas fa-circle" style="color:#B29EF3"></i><?php echo $language_array[4]['言語']; ?></li>
-                        <li><i class="fas fa-circle" style="color:#6D46EC"></i><?php echo $language_array[5]['言語']; ?></li>
-                        <li><i class="fas fa-circle" style="color:#4A17EF"></i><?php echo $language_array[6]['言語']; ?></li>
-                        <li><i class="fas fa-circle" style="color:#3105C0"></i><?php echo $language_array[7]['言語']; ?></li>
+                        @foreach ($hours_language_array as $language)
+                            <li><i class="fas fa-circle"
+                                    style="color:{{ $language['color_code'] }}"></i>
+                                    {{ $language['language_name'] }}
+                            </li>
+                        @endforeach
                     </ul>
                 </div>
             </div>
@@ -234,9 +217,11 @@ for ($j = 1; $j <= date('t'); $j++) {
                 <canvas id="material-chart-doughnut" width="15" height="10"></canvas>
                 <div>
                     <ul class="material">
-                        <li><i class="fas fa-circle" style="color:#0345EC"></i><?php echo $content_array[0]['コンテンツ']; ?></li>
-                        <li><i class="fas fa-circle" style="color:#0F71BD"></i><?php echo $content_array[1]['コンテンツ']; ?></li>
-                        <li><i class="fas fa-circle" style="color:#20BDDE"></i><?php echo $content_array[2]['コンテンツ']; ?></li>
+                        @foreach ($hours_content_array as $content)
+                            <li><i class="fas fa-circle"
+                                    style="color:{{ $content['color_code'] }}"></i>{{ $content['content_name'] }}
+                            </li>
+                        @endforeach
                     </ul>
                 </div>
             </div>
@@ -244,31 +229,41 @@ for ($j = 1; $j <= date('t'); $j++) {
     </div>
     <!-- 月移動 -->
     <div class="calender">
-        <button id="previous-month" class="calender-arrow">&lt;</button>
-        <div id="year-month">
-            <span id="year">
-                <?php
-                if (isset($_GET['month']) && isset($_GET['year'])) {
-                    echo $moveYear;
-                } else {
-                    echo $year;
-                }; ?></span>年<span id="month"><?php
-                                                if (isset($_GET['month']) && isset($_GET['year']) && $moveMonth <= 12) {
-                                                    echo $moveMonth;
-                                                } else {
-                                                    echo $month;
-                                                }; ?>
-            </span>月
-        </div>
-        <button id="next-month" class="calender-arrow">&gt;</button>
+    <div style="display:flex;">
+        <form action="/month" method="POST">
+            @csrf
+            @if ($calender_month == 1)
+                <input name="month" value="12" hidden>
+                <input name="year" value="{{ session()->get('year') - 1 }}" hidden>
+            @else
+                <input name="month" value="{{ $calender_month - 1 }}" hidden>
+                <input name="year" value="{{ session()->get('year') }}" hidden>
+            @endif
+            <input type="submit" value="<">
+        </form>
+        <div>{{ session()->get('year') . '年' . session()->get('month') . '月' }}</div>
+        <form action="/month" method="POST">
+            @csrf
+            @if ($calender_month == 12)
+                <input name="month" value="1" hidden>
+                <input name="year" value="{{ session()->get('year') + 1 }}" hidden>
+            @else
+                <input name="month" value="{{ $calender_month + 1 }}" hidden>
+                <input name="year" value="{{ session()->get('year') }}" hidden>
+            @endif
+            <input type="submit" value=">">
+        </form>
     </div>
+    </div>
+    {{ dd('yes') }}
     <!-- 記録投稿ボタンを押した時表示されるオーバーレイ -->
     <div id="fullOverlay" hidden>
         <div class="overlay">
             <form id="logout-form" hidden action="" method="POST">
                 <div>
                     <div style="position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);">
-                        <input class="post-button" style="background-color:yellow;color:black;" type="submit" value="ログアウトする" name="login_page"></input>
+                        <input class="post-button" style="background-color:yellow;color:black;" type="submit"
+                            value="ログアウトする" name="login_page"></input>
                     </div>
                 </div>
             </form>
@@ -323,7 +318,8 @@ for ($j = 1; $j <= date('t'); $j++) {
                             削除依頼理由記入欄:
                             <textarea type="text" name="delete_reason" placeholder="理由記入して下さい" required></textarea>
                         </div>
-                        <input type="submit" value="削除依頼送信" style="display:block;margin:auto;pointerEvents:none;"></input>
+                        <input type="submit" value="削除依頼送信"
+                            style="display:block;margin:auto;pointerEvents:none;"></input>
                     </div>
                 </div>
             </form>
@@ -333,14 +329,15 @@ for ($j = 1; $j <= date('t'); $j++) {
                         <div class="form-left">
                             <div class="date-container">
                                 <div>学習日</div>
-                                <input id="date" type="date" name="date" size="20" class="textbox" value="<?php
-                                                                                                            echo htmlspecialchars($submitDate, ENT_QUOTES, 'UTF-8');
-                                                                                                            if (isset($_GET['month']) && isset($_GET['year'])) {
-                                                                                                                $one_digit_date = $moveYear . '-' . $moveMonth . '-' . $date;
-                                                                                                                echo date('Y-m-d', strtotime($one_digit_date));
-                                                                                                            } else {
-                                                                                                                echo date('Y-m-d');
-                                                                                                            }; ?>" required>
+                                <input id="date" type="date" name="date" size="20" class="textbox"
+                                    value="<?php
+                                    echo htmlspecialchars($submitDate, ENT_QUOTES, 'UTF-8');
+                                    if (isset($_GET['month']) && isset($_GET['year'])) {
+                                        $one_digit_date = $moveYear . '-' . $moveMonth . '-' . $date;
+                                        echo date('Y-m-d', strtotime($one_digit_date));
+                                    } else {
+                                        echo date('Y-m-d');
+                                    } ?>" required>
                             </div>
                             <div class="study-content-container">
                                 <div>学習コンテンツ</div>
@@ -429,7 +426,8 @@ for ($j = 1; $j <= date('t'); $j++) {
                         <div class="form-right">
                             <div class="hour-container">
                                 <div>学習時間</div>
-                                <input type="number" name="hours" id="time" size="20" class="textbox" required></input>
+                                <input type="number" name="hours" id="time" size="20" class="textbox"
+                                    required></input>
                                 <!-- 半角数字以外入力無効 -->
                             </div>
                             <div class="comment-container">
@@ -461,7 +459,9 @@ for ($j = 1; $j <= date('t'); $j++) {
         </div>
     </div>
 </body>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.6.0/chart.min.js" integrity="sha512-GMGzUEevhWh8Tc/njS0bDpwgxdCJLQBWG3Z2Ct+JGOpVnEmjvNx6ts4v6A2XJf1HOrtOsfhv3hBKpK9kE5z8AQ==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.6.0/chart.min.js"
+    integrity="sha512-GMGzUEevhWh8Tc/njS0bDpwgxdCJLQBWG3Z2Ct+JGOpVnEmjvNx6ts4v6A2XJf1HOrtOsfhv3hBKpK9kE5z8AQ=="
+    crossorigin="anonymous" referrerpolicy="no-referrer"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.7.2/Chart.bundle.js"></script>
 <!-- datalabelsプラグインを呼び出す -->
 <script src="./chartjs-plugin-labels.js"></script>
@@ -481,7 +481,9 @@ for ($j = 1; $j <= date('t'); $j++) {
     var myChart = new Chart(hourBargraphCtx, {
         type: "bar", // ★必須　グラフの種類
         data: {
-            labels: [,"","2","", "4","", "6","", "8","", "10","", "12","", "14","", "16","", "18","", "20","", "22","", "24","", "26","", "28","", "30"], // Ｘ軸のラベル
+            labels: [, "", "2", "", "4", "", "6", "", "8", "", "10", "", "12", "", "14", "", "16", "", "18", "",
+                "20", "", "22", "", "24", "", "26", "", "28", "", "30"
+            ], // Ｘ軸のラベル
             datasets: [{
                 label: "Data", // 系列名
                 data: [
@@ -632,7 +634,9 @@ for ($j = 1; $j <= date('t'); $j++) {
                     <?php echo $language_array[6]['合計時間']; ?>,
                     <?php echo $language_array[7]['合計時間']; ?>,
                 ],
-                backgroundColor: ['#0345EC', '#0F71BD', '#20BDDE', '#3CCEFE', '#B29EF3', '#6D46EC', '#4A17EF', '#3105C0'],
+                backgroundColor: ['#0345EC', '#0F71BD', '#20BDDE', '#3CCEFE', '#B29EF3', '#6D46EC',
+                    '#4A17EF', '#3105C0'
+                ],
                 weight: 100,
             }],
         },

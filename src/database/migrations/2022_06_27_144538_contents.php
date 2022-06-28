@@ -16,6 +16,7 @@ class Contents extends Migration
         Schema::create('contents',function(Blueprint $table){
             $table->increments('id');
             $table->string('content');
+            $table->string('color_code');
         });
     }
 

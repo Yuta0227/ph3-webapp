@@ -27,6 +27,8 @@ class HomeController extends Controller
     {
         $user=Auth::user();  
         session(['user'=>$user]);
+        session(['year'=>date('Y')]);
+        session(['month'=>date('m')]);
         if($user->admin_bool==1){
             return view('home',compact('user'));
         }else{
