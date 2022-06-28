@@ -9,6 +9,8 @@ use App\Content;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 
+
+
 class WebappController extends Controller
 {
     public function index()
@@ -131,7 +133,7 @@ class WebappController extends Controller
                     $hours+=$data->hours;
                 }
             }
-            $hours_language_array[]=array($language_name=>$hours,'color_code'=>$language_color,'language_name'=>$language_name);
+            $hours_language_array[]=array('hours'=>$hours,'color_code'=>$language_color,'language_name'=>$language_name);
         }
         return $hours_language_array;
     }
@@ -150,7 +152,7 @@ class WebappController extends Controller
                     $hours+=$data->hours;
                 }
             }
-            $hours_content_array[]=array($content_name=>$hours,'color_code'=>$content_color,'content_name'=>$content_name);
+            $hours_content_array[]=array('hours'=>$hours,'color_code'=>$content_color,'content_name'=>$content_name);
         }
         return $hours_content_array;
     }

@@ -157,8 +157,8 @@
         {{-- <div><a href="/logout">ログアウト</a></div> --}}
         <select name="buttons" class="button-container">
             <option id="header-logout-button" class="post-button">ログアウト</option>
-            <option id="header-delete-button" class="post-button">削除依頼</option>
-            <option id="header-post-button" class="post-button">記録・投稿</option>
+            {{-- <option id="header-delete-button" class="post-button">削除依頼</option>
+            <option id="header-post-button" class="post-button">記録・投稿</option> --}}
         </select>
         <div style="align-items:center;display:flex;justify-content:center;padding-right:20px;">
             <input type="button" value="確定" id="decide-button">
@@ -204,9 +204,8 @@
                 <div>
                     <ul class="language">
                         @foreach ($hours_language_array as $language)
-                            <li><i class="fas fa-circle"
-                                    style="color:{{ $language['color_code'] }}"></i>
-                                    {{ $language['language_name'] }}
+                            <li><i class="fas fa-circle" style="color:{{ $language['color_code'] }}"></i>
+                                {{ $language['language_name'] }}
                             </li>
                         @endforeach
                     </ul>
@@ -229,45 +228,45 @@
     </div>
     <!-- 月移動 -->
     <div class="calender">
-    <div style="display:flex;">
-        <form action="/month" method="POST">
-            @csrf
-            @if ($calender_month == 1)
-                <input name="month" value="12" hidden>
-                <input name="year" value="{{ session()->get('year') - 1 }}" hidden>
-            @else
-                <input name="month" value="{{ $calender_month - 1 }}" hidden>
-                <input name="year" value="{{ session()->get('year') }}" hidden>
-            @endif
-            <input type="submit" value="<">
-        </form>
-        <div>{{ session()->get('year') . '年' . session()->get('month') . '月' }}</div>
-        <form action="/month" method="POST">
-            @csrf
-            @if ($calender_month == 12)
-                <input name="month" value="1" hidden>
-                <input name="year" value="{{ session()->get('year') + 1 }}" hidden>
-            @else
-                <input name="month" value="{{ $calender_month + 1 }}" hidden>
-                <input name="year" value="{{ session()->get('year') }}" hidden>
-            @endif
-            <input type="submit" value=">">
-        </form>
+        <div style="display:flex;">
+            <form action="/month" method="POST">
+                @csrf
+                @if ($calender_month == 1)
+                    <input name="month" value="12" hidden>
+                    <input name="year" value="{{ session()->get('year') - 1 }}" hidden>
+                @else
+                    <input name="month" value="{{ $calender_month - 1 }}" hidden>
+                    <input name="year" value="{{ session()->get('year') }}" hidden>
+                @endif
+                <input type="submit" value="<">
+            </form>
+            <div>{{ session()->get('year') . '年' . session()->get('month') . '月' }}</div>
+            <form action="/month" method="POST">
+                @csrf
+                @if ($calender_month == 12)
+                    <input name="month" value="1" hidden>
+                    <input name="year" value="{{ session()->get('year') + 1 }}" hidden>
+                @else
+                    <input name="month" value="{{ $calender_month + 1 }}" hidden>
+                    <input name="year" value="{{ session()->get('year') }}" hidden>
+                @endif
+                <input type="submit" value=">">
+            </form>
+        </div>
     </div>
-    </div>
-    {{ dd('yes') }}
     <!-- 記録投稿ボタンを押した時表示されるオーバーレイ -->
     <div id="fullOverlay" hidden>
         <div class="overlay">
-            <form id="logout-form" hidden action="" method="POST">
+            <form id="logout-form" hidden action="/logout" method="POST">
+                @csrf
                 <div>
                     <div style="position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);">
                         <input class="post-button" style="background-color:yellow;color:black;" type="submit"
-                            value="ログアウトする" name="login_page"></input>
+                            value="ログアウトする" name="login_page">
                     </div>
                 </div>
             </form>
-            <form id="delete-form" hidden action="" method="POST">
+            {{-- <form id="delete-form" hidden action="/delete_data" method="POST">
                 <div class="delete-form">
                     削除依頼のためのフォーム（管理者へ送信）
                     <div style="width:100%;">
@@ -284,33 +283,33 @@
                             </tr>
                             <tr>
                                 <?php
-                                $delete_data->delete_data_table(0);
-                                $delete_data->check_existence(0);
+                                // $delete_data->delete_data_table(0);
+                                // $delete_data->check_existence(0);
                                 ?>
 
                             </tr>
                             <tr>
                                 <?php
-                                $delete_data->delete_data_table(1);
-                                $delete_data->check_existence(1);
+                                // $delete_data->delete_data_table(1);
+                                // $delete_data->check_existence(1);
                                 ?>
                             </tr>
                             <tr>
                                 <?php
-                                $delete_data->delete_data_table(2);
-                                $delete_data->check_existence(2);
+                                // $delete_data->delete_data_table(2);
+                                // $delete_data->check_existence(2);
                                 ?>
                             </tr>
                             <tr>
                                 <?php
-                                $delete_data->delete_data_table(3);
-                                $delete_data->check_existence(3);
+                                // $delete_data->delete_data_table(3);
+                                // $delete_data->check_existence(3);
                                 ?>
                             </tr>
                             <tr>
                                 <?php
-                                $delete_data->delete_data_table(4);
-                                $delete_data->check_existence(4);
+                                // $delete_data->delete_data_table(4);
+                                // $delete_data->check_existence(4);
                                 ?>
                             </tr>
                         </table>
@@ -322,8 +321,8 @@
                             style="display:block;margin:auto;pointerEvents:none;"></input>
                     </div>
                 </div>
-            </form>
-            <form id="post-form" hidden action="" method="POST">
+            </form> --}}
+            {{-- <form id="post-form" hidden action="" method="POST">
                 <div class="form">
                     <div class="form-direction">
                         <div class="form-left">
@@ -331,13 +330,14 @@
                                 <div>学習日</div>
                                 <input id="date" type="date" name="date" size="20" class="textbox"
                                     value="<?php
-                                    echo htmlspecialchars($submitDate, ENT_QUOTES, 'UTF-8');
-                                    if (isset($_GET['month']) && isset($_GET['year'])) {
-                                        $one_digit_date = $moveYear . '-' . $moveMonth . '-' . $date;
-                                        echo date('Y-m-d', strtotime($one_digit_date));
-                                    } else {
-                                        echo date('Y-m-d');
-                                    } ?>" required>
+                                    // echo htmlspecialchars($submitDate, ENT_QUOTES, 'UTF-8');
+                                    // if (isset($_GET['month']) && isset($_GET['year'])) {
+                                    //     $one_digit_date = $moveYear . '-' . $moveMonth . '-' . $date;
+                                    //     echo date('Y-m-d', strtotime($one_digit_date));
+                                    // } else {
+                                    //     echo date('Y-m-d');
+                                    // }
+                                    ?>" required>
                             </div>
                             <div class="study-content-container">
                                 <div>学習コンテンツ</div>
@@ -427,7 +427,7 @@
                             <div class="hour-container">
                                 <div>学習時間</div>
                                 <input type="number" name="hours" id="time" size="20" class="textbox"
-                                    required></input>
+                                    required>
                                 <!-- 半角数字以外入力無効 -->
                             </div>
                             <div class="comment-container">
@@ -447,7 +447,7 @@
                         <input type="submit" value="記録・投稿" id="post-button" class="post-button"></input>
                     </div>
                 </div>
-            </form>
+            </form> --}}
             <button id="exit" class="exit"><i class="fas fa-times"></i></button>
         </div>
     </div>
@@ -459,243 +459,24 @@
         </div>
     </div>
 </body>
+<script>
+    const bargraph_data=@json($bargraph_data);
+    const hours_language_array = @json($hours_language_array);
+    const hours_content_array = @json($hours_content_array);
+</script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.6.0/chart.min.js"
     integrity="sha512-GMGzUEevhWh8Tc/njS0bDpwgxdCJLQBWG3Z2Ct+JGOpVnEmjvNx6ts4v6A2XJf1HOrtOsfhv3hBKpK9kE5z8AQ=="
     crossorigin="anonymous" referrerpolicy="no-referrer"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.7.2/Chart.bundle.js"></script>
 <!-- datalabelsプラグインを呼び出す -->
-<script src="./chartjs-plugin-labels.js"></script>
-<script src="./webapp.js?v=<?= date('s') ?>"></script>
+<script src="{{ asset('js/chartjs-plugin-labels.js') }}"></script>
+<script src="{{ asset('js/webapp.js') }}"></script>
 <script>
-    var hourBargraphCtx = document.getElementById("hour-bargraph").getContext('2d');
-    var hourBargraph = document.getElementById('hour-bragraph');
-    var bargraphContainer = document.getElementById('bargraph-container');
-    // hourBargraphCtx.canvas.height=bargraphContainer.style.height;
-    // hourBargraphCtx.canvas.width=bargraphContainer.style.width;
-
-    var gradient = hourBargraphCtx.createLinearGradient(15, 0, 15, 300);
-    //今はバーグラフの左上を基準にしたのグラデーション。各バーを基準にしたグラデーション。数値が12じゃないときグラデーション崩れる
-    gradient.addColorStop(0, '#137DC4');
-    gradient.addColorStop(0.9, '#38C7F9');
-
-    var myChart = new Chart(hourBargraphCtx, {
-        type: "bar", // ★必須　グラフの種類
-        data: {
-            labels: [, "", "2", "", "4", "", "6", "", "8", "", "10", "", "12", "", "14", "", "16", "", "18", "",
-                "20", "", "22", "", "24", "", "26", "", "28", "", "30"
-            ], // Ｘ軸のラベル
-            datasets: [{
-                label: "Data", // 系列名
-                data: [
-                    <?php echo $date_array[0]; ?>,
-                    <?php echo $date_array[1]; ?>,
-                    <?php echo $date_array[2]; ?>,
-                    <?php echo $date_array[3]; ?>,
-                    <?php echo $date_array[4]; ?>,
-                    <?php echo $date_array[5]; ?>,
-                    <?php echo $date_array[6]; ?>,
-                    <?php echo $date_array[7]; ?>,
-                    <?php echo $date_array[8]; ?>,
-                    <?php echo $date_array[9]; ?>,
-                    <?php echo $date_array[10]; ?>,
-                    <?php echo $date_array[11]; ?>,
-                    <?php echo $date_array[12]; ?>,
-                    <?php echo $date_array[13]; ?>,
-                    <?php echo $date_array[14]; ?>,
-                    <?php echo $date_array[15]; ?>,
-                    <?php echo $date_array[16]; ?>,
-                    <?php echo $date_array[17]; ?>,
-                    <?php echo $date_array[18]; ?>,
-                    <?php echo $date_array[19]; ?>,
-                    <?php echo $date_array[20]; ?>,
-                    <?php echo $date_array[21]; ?>,
-                    <?php echo $date_array[22]; ?>,
-                    <?php echo $date_array[23]; ?>,
-                    <?php echo $date_array[24]; ?>,
-                    <?php echo $date_array[25]; ?>,
-                    <?php echo $date_array[26]; ?>,
-                    <?php echo $date_array[27]; ?>,
-                    <?php echo $date_array[28]; ?>,
-                    <?php echo $date_array[29]; ?>,
-                    <?php echo $date_array[30]; ?>,
-                ], // ★必須　系列Ａのデータ
-                backgroundColor: gradient, // 棒の塗りつぶし色
-                borderColor: gradient, // 棒の枠線の色
-                borderWidth: 1, // 枠線の太さ
-            }]
-        },
-
-        options: { // オプション
-            responsive: false, // canvasサイズ自動設定機能を使わない。HTMLで指定したサイズに固定
-            title: { // タイトル
-                display: false, // 表示設定
-                fontSize: 18, // フォントサイズ
-                fontFamily: "sans-serif",
-                text: 'タイトル' // タイトルのラベル
-            },
-            legend: { // 凡例
-                display: false // 表示の有無
-                // position: 'bottom'              // 表示位置
-            },
-            scales: { // 軸設定
-                xAxes: [ // Ｘ軸設定
-                    {
-                        display: true, // 表示の有無
-                        barPercentage: 0.4, // カテゴリ幅に対する棒の幅の割合
-                        //categoryPercentage: 0.8,    // 複数棒のスケールに対する幅の割合
-                        scaleLabel: { // 軸ラベル
-                            display: false, // 表示設定
-                            labelString: '横軸ラベル', // ラベル
-                            fontColor: "#97b9d1", // 文字の色
-                            fontSize: 8 // フォントサイズ
-                        },
-                        gridLines: { // 補助線
-                            display: false // 補助線なし
-                        },
-                        ticks: { // 目盛り
-                            fontColor: "#97b9d1", // 目盛りの色
-                            fontSize: 14, // フォントサイズ
-                        },
-                    }
-                ],
-                yAxes: [ // Ｙ軸設定
-                    {
-                        display: true, // 表示の有無
-                        scaleLabel: { // 軸ラベル
-                            display: false, // 表示の有無
-                            labelString: '縦軸ラベル', // ラベル
-                            fontFamily: "sans-serif", // フォントファミリー
-                            fontColor: "#97b9d1", // 文字の色
-                            fontSize: 16 // フォントサイズ
-                        },
-                        gridLines: { // 補助線
-                            display: false, // 補助線なし
-                            color: "rgba(0, 0, 255, 0.2)", // 補助線の色
-                            zeroLineColor: "black" // y=0（Ｘ軸の色）
-                        },
-                        ticks: { // 目盛り
-                            min: 0, // 最小値
-                            max: 20, // 最大値
-                            stepSize: 4, // 軸間隔
-                            fontColor: "#97b9d1", // 目盛りの色
-                            fontSize: 14 // フォントサイズ
-                        },
-                    }
-                ],
-            },
-            layout: { // 全体のレイアウト
-                padding: { // 余白
-                    left: 0,
-                    right: 0,
-                    top: 0,
-                    bottom: 1
-                }
-            },
-            plugins: {
-                labels: {
-                    display: false,
-                    // render: 'percentage',
-                    fontColor: '#00000000',
-                    fontSize: 20,
-                },
-                datalabels: {
-                    display: false
-                }
-            },
-            maintainAspectRatio: true
-        }
-    });
-
-
-
-    //学習言語と学習コンテンツのチャート
-    var language = document.getElementById('language-chart-doughnut');
-    var myLanguageChart = new Chart(language, {
-        type: 'doughnut',
-        data: {
-            labels: [
-                '<?php echo $language_array[0]['言語']; ?>',
-                '<?php echo $language_array[1]['言語']; ?>',
-                '<?php echo $language_array[2]['言語']; ?>',
-                '<?php echo $language_array[3]['言語']; ?>',
-                '<?php echo $language_array[4]['言語']; ?>',
-                '<?php echo $language_array[5]['言語']; ?>',
-                '<?php echo $language_array[6]['言語']; ?>',
-                '<?php echo $language_array[7]['言語']; ?>'
-            ],
-            datasets: [{
-                data: [
-                    <?php echo $language_array[0]['合計時間']; ?>,
-                    <?php echo $language_array[1]['合計時間']; ?>,
-                    <?php echo $language_array[2]['合計時間']; ?>,
-                    <?php echo $language_array[3]['合計時間']; ?>,
-                    <?php echo $language_array[4]['合計時間']; ?>,
-                    <?php echo $language_array[5]['合計時間']; ?>,
-                    <?php echo $language_array[6]['合計時間']; ?>,
-                    <?php echo $language_array[7]['合計時間']; ?>,
-                ],
-                backgroundColor: ['#0345EC', '#0F71BD', '#20BDDE', '#3CCEFE', '#B29EF3', '#6D46EC',
-                    '#4A17EF', '#3105C0'
-                ],
-                weight: 100,
-            }],
-        },
-        options: {
-            legend: {
-                display: false
-            },
-            title: {
-                display: true,
-                text: '割合'
-            },
-            plugins: {
-                labels: {
-                    render: 'percentage',
-                    fontColor: '#00000000',
-                    fontSize: 10
-                }
-            }
-        }
-    });
-    var material = document.getElementById('material-chart-doughnut');
-    var myMaterialChart = new Chart(material, {
-        type: 'doughnut',
-        data: {
-            labels: [
-                '<?php echo $content_array[0]['コンテンツ']; ?>',
-                '<?php echo $content_array[1]['コンテンツ']; ?>',
-                '<?php echo $content_array[2]['コンテンツ']; ?>',
-            ],
-            datasets: [{
-                data: [
-                    <?php echo $content_array[0]['合計時間']; ?>,
-                    <?php echo $content_array[1]['合計時間']; ?>,
-                    <?php echo $content_array[2]['合計時間']; ?>
-                ],
-                backgroundColor: ['#0345EC', '#0F71BD', '#20BDDE'],
-                weight: 100,
-            }],
-        },
-        //表示順を大きい順にする方法がわからん。おそらくこのままだと数値は順番変更できてもそれがラベルの内容とずれるかも
-        options: {
-            legend: {
-                display: false
-            },
-            title: {
-                display: true,
-                text: '割合'
-            },
-            plugins: {
-                labels: {
-                    render: 'percentage',
-                    fontColor: '#00000000',
-                    fontSize: 10
-                }
-            }
-        }
-    });
+    
 </script>
+{{ dd($hours_language_array) }}
 
 </html>
 
+//
 <!-- 最初はurlから情報取得せず現在の日時などを表示月移動するときurlから数値取得して$monthから引いたり足したりする -->
