@@ -1,10 +1,3 @@
-<a href="/logout">ログアウト</a>
-
-<div style="display:flex;">
-    @foreach ($bargraph_data as $data)
-        <div style="border:1px solid black;">{{ $data }}</div>
-    @endforeach
-</div>
 
 <?php
 // dd($hours_today);
@@ -154,7 +147,6 @@
             <span class="week">{{ $week_number . '週目の' . session()->get('user')->name . 'さんの勉強時間' }}
             </span>
         </div>
-        {{-- <div><a href="/logout">ログアウト</a></div> --}}
         <select name="buttons" class="button-container">
             <option id="header-logout-button" class="post-button">ログアウト</option>
             {{-- <option id="header-delete-button" class="post-button">削除依頼</option>
@@ -266,7 +258,7 @@
                     </div>
                 </div>
             </form>
-            {{-- <form id="delete-form" hidden action="/delete_data" method="POST">
+            <form id="delete-form" hidden action="/delete_data" method="POST">
                 <div class="delete-form">
                     削除依頼のためのフォーム（管理者へ送信）
                     <div style="width:100%;">
@@ -321,8 +313,8 @@
                             style="display:block;margin:auto;pointerEvents:none;"></input>
                     </div>
                 </div>
-            </form> --}}
-            {{-- <form id="post-form" hidden action="" method="POST">
+            </form>
+            <form id="post-form" hidden action="" method="POST">
                 <div class="form">
                     <div class="form-direction">
                         <div class="form-left">
@@ -447,7 +439,7 @@
                         <input type="submit" value="記録・投稿" id="post-button" class="post-button"></input>
                     </div>
                 </div>
-            </form> --}}
+            </form>
             <button id="exit" class="exit"><i class="fas fa-times"></i></button>
         </div>
     </div>
@@ -474,9 +466,8 @@
 <script>
     
 </script>
-{{ dd($hours_language_array) }}
 
 </html>
 
-//
+
 <!-- 最初はurlから情報取得せず現在の日時などを表示月移動するときurlから数値取得して$monthから引いたり足したりする -->
