@@ -20,6 +20,8 @@ class StudyDataTable extends Migration
             $table->integer('language_id');
             $table->integer('hours');
             $table->datetime('posted_at');
+            $table->foreign('content_id')->references('id')->on('contents');
+            $table->foreign('language_id')->references('id')->on('languages');
         });
     }
 

@@ -149,8 +149,8 @@
         </div>
         <select name="buttons" class="button-container">
             <option id="header-logout-button" class="post-button">ログアウト</option>
-            {{-- <option id="header-delete-button" class="post-button">削除依頼</option>
-            <option id="header-post-button" class="post-button">記録・投稿</option> --}}
+            <option id="header-delete-button" class="post-button">削除依頼</option>
+            <option id="header-post-button" class="post-button">記録・投稿</option> 
         </select>
         <div style="align-items:center;display:flex;justify-content:center;padding-right:20px;">
             <input type="button" value="確定" id="decide-button">
@@ -321,15 +321,7 @@
                             <div class="date-container">
                                 <div>学習日</div>
                                 <input id="date" type="date" name="date" size="20" class="textbox"
-                                    value="<?php
-                                    // echo htmlspecialchars($submitDate, ENT_QUOTES, 'UTF-8');
-                                    // if (isset($_GET['month']) && isset($_GET['year'])) {
-                                    //     $one_digit_date = $moveYear . '-' . $moveMonth . '-' . $date;
-                                    //     echo date('Y-m-d', strtotime($one_digit_date));
-                                    // } else {
-                                    //     echo date('Y-m-d');
-                                    // }
-                                    ?>" required>
+                                    value="{{ $today_post_calender }}" required>
                             </div>
                             <div class="study-content-container">
                                 <div>学習コンテンツ</div>
