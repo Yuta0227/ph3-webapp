@@ -42,12 +42,27 @@ class WebappTest extends TestCase
         $response = $this->post('login', [
             'email' => $user->email,
             'password' => 'test',
-            'admin_bool'=>1
+            'admin_bool' => 1
         ]);
         $this->assertTrue(Auth::check());
         $response->assertRedirect('home');
     }
-    public function testUserLogin(){
+    public function testUserLogin()
+    {
+        // $user = factory(User::class)->create([
+        //     'password' => bcrypt('test')
+        // ]);
+        // $this->assertFalse(Auth::check());
+        // $response = $this->post('login', [
+        //     'email' => $user->email,
+        //     'password' => 'test',
+        //     'admin_bool'=>0
+        // ]);
+        // $this->assertTrue(Auth::check());
+        // session(['user'=>$response]);
+        // redirect()->action('WebappController@index');
+        // $response->assertRedirect('webapp');
+
         $user = factory(User::class)->create([
             'password' => bcrypt('test')
         ]);
@@ -55,22 +70,25 @@ class WebappTest extends TestCase
         $response = $this->post('login', [
             'email' => $user->email,
             'password' => 'test',
-            'admin_bool'=>0
+            'admin_bool' => 0
         ]);
         $this->assertTrue(Auth::check());
-        session(['user'=>$response]);
-        redirect()->action('WebappController@index');
-        $response->assertRedirect('webapp');
+        // ログインの責務はここまで、homeにリダイレクト指定以外に関心事はない&持ったらダメ
+        $response->assertRedirect('home');
+
+        // 擬似的にhomeへリダイレクトしていることを再現 (テスト内ではログイン状態を保持しているつもりで書いてます)
+        $responseFromHome = $this->get('home');
+        $responseFromHome->assertRedirect('webapp');
     }
     public function testContent()
     {
-        $id=1;
-        $content='content';
-        $color_code='#000000';
-        $data= [
-            'id'=>$id,
-            'content'=>$content,
-            'color_code'=>$color_code,
+        $id = 1;
+        $content = 'content';
+        $color_code = '#000000';
+        $data = [
+            'id' => $id,
+            'content' => $content,
+            'color_code' => $color_code,
         ];
         factory(Content::class)->create();
         $this->assertDatabaseHas('contents', $data);
@@ -80,12 +98,12 @@ class WebappTest extends TestCase
         $id = 1;
         $language = 'language';
         $color_code = '#000000';
-        $data=[
+        $data = [
             'id' => $id,
             'language' => $language,
             'color_code' => $color_code,
         ];
-        factory(Language::class,1)->create();
+        factory(Language::class, 1)->create();
         $this->assertDatabaseHas('languages', $data);
     }
 }

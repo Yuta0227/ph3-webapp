@@ -1,0 +1,10 @@
+{
+    "dineug.vuerd-vscode.themeSync": true,
+    // will NOT synchronize the color list
+    "dineug.vuerd-vscode.theme": {
+      "keyPK": "#B4B400",
+      "keyFK": "#dda8b1",
+      "keyPFK": "#60b9c4",
+      "edit": "#ffc107"
+    }
+  }

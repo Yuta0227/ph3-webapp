@@ -10,17 +10,9 @@ const date = document.getElementById('date');
 const pcPost = document.getElementById('post-button');
 const animationFilter = document.getElementById('animation-filter');
 const animationText = document.getElementById('animation-text')
-// const previousMonth = document.getElementById('previous-month');
-// const nextMonth = document.getElementById('next-month');
-// const yearMonth = document.getElementById('year-month');
-// const month = document.getElementById('month');
-// const year = document.getElementById('year');
 const logoutForm = document.getElementById('logout-form');
-// const deleteForm=document.getElementById('delete-form');
 const postForm=document.getElementById('post-form');
 var now = new Date();
-// var innerhtmlMonth = month.innerHTML;
-// var innerhtmlYear = year.innerHTML;
 var chosenDate;
 var chosenMonth;
 var chosenYear;
@@ -120,31 +112,9 @@ pcPost.addEventListener('click', function () {
     }
 });
 
-// previousMonth.addEventListener('click', function () {
-//     innerhtmlMonth--;
-//     if (innerhtmlMonth == 0) {
-//         innerhtmlMonth = innerhtmlMonth + 12;
-//         innerhtmlYear--;
-//     };
-//     window.location.href = `http://localhost:8080/webapp.php?month=${innerhtmlMonth - 0}&year=${innerhtmlYear - 0}`;
-// });
-// if (innerhtmlMonth - 0 >= now.getMonth() + 1 && innerhtmlYear - 0 >= now.getFullYear()) {
-//     nextMonth.style.display = 'none';
-//     nextMonth.style.pointerEvents = 'none';
-// };
-// nextMonth.addEventListener('click', function () {
-//     innerhtmlMonth++;
-//     if (innerhtmlMonth == 13) {
-//         innerhtmlMonth = innerhtmlMonth - 12;
-//         innerhtmlYear++;
-//     };
-//     window.location.href = `http://localhost:8080/webapp.php?month=${innerhtmlMonth - 0}&year=${innerhtmlYear - 0}`;
-// });
 var hourBargraphCtx = document.getElementById("hour-bargraph").getContext('2d');
 var hourBargraph = document.getElementById('hour-bragraph');
 var bargraphContainer = document.getElementById('bargraph-container');
-// hourBargraphCtx.canvas.height=bargraphContainer.style.height;
-// hourBargraphCtx.canvas.width=bargraphContainer.style.width;
 const bargraph_data_array = Object.values(bargraph_data);
 var gradient = hourBargraphCtx.createLinearGradient(15, 0, 15, 300);
 //今はバーグラフの左上を基準にしたのグラデーション。各バーを基準にしたグラデーション。数値が12じゃないときグラデーション崩れる
