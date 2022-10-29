@@ -9,7 +9,7 @@ services:
     volumes:
       - ./db/var/lib/mysql:/var/lib/mysql
     environment:
-      - MYSQL_DATABASE=laravel
+      - MYSQL_DATABASE=webapp
       - MYSQL_USER=laravel
       - MYSQL_PASSWORD=password
       - MYSQL_ROOT_PASSWORD=password
