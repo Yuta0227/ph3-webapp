@@ -2,7 +2,12 @@
 
 namespace App\Http\Controllers;
 
+use App\Mail\Webapp;
+use App\User;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Mail;
+
 
 class HomeController extends Controller
 {
@@ -23,6 +28,20 @@ class HomeController extends Controller
      */
     public function index()
     {
-        return view('home');
+        $user=Auth::user();  
+        session(['user'=>$user]);
+        session(['year'=>date('Y')]);
+        session(['month'=>date('m')]);
+        // if($user->admin_bool==1){
+            // if(Auth::user()->admin_bool!==1){
+            //     return redirect()->to(app('url'))->previous()
+            //         ->withErrors('一般ユーザーは帰れ');
+            // } 
+            return redirect()->action('WebappController@index');
+        // }
+    }
+    public function send_mail(Request $request){
+        Mail::from($_ENV['MAIL_FROM_ADDRESS'])->to($request->to)->send(new Webapp());
+        return redirect('/home');
     }
 }
