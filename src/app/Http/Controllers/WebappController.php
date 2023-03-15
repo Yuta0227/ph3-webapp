@@ -6,84 +6,130 @@ use App\Language;
 use App\StudyData;
 use Carbon\Carbon;
 use App\Content;
+use App\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
-
-
+use Illuminate\Support\Facades\Validator;
 
 class WebappController extends Controller
 {
     public function index()
     {
-        if(session()->get('user')==null){
+        if (session()->get('user') == null) {
             return redirect('/login');
         }
-        $year=session()->get('year');
-        $month=session()->get('month');
-        list($y,$m,$d)=explode('-',date('Y-n-j'));
-        $week_number=$this->getWeekNo($y,$m,$d);
-        $calender_month=$this->single($month);
-        $study_data=StudyData::getData(session()->get('user')->id)->get();
-        $hours_today=$this->hours_today();
-        $hours_month=$this->hours_month($year,$month);
-        $hours_total=$this->hours_total();
-        $bargraph_data=$this->bargraph_data($year,$month);
-        $hours_language_array=$this->languages();
-        $hours_content_array=$this->contents();
-        return view('webapp', compact('study_data','hours_today','hours_month','hours_total','bargraph_data','calender_month','week_number','hours_language_array','hours_content_array'));
+        if(Auth::user()->admin_bool==1){
+            $all_users=User::get();
+        }
+        $year = session()->get('year');
+        $month = session()->get('month');
+        list($y, $m, $d) = explode('-', date('Y-n-j'));
+        $week_number = $this->getWeekNo($y, $m, $d);
+        $calender_month = $this->single($month);
+        $study_data = StudyData::getData(session()->get('user')->id)->get();
+        $hours_today = $this->hours_today();
+        $hours_month = $this->hours_month($year, $month);
+        $hours_total = $this->hours_total();
+        $bargraph_data = $this->bargraph_data($year, $month);
+        $hours_language_array = $this->languages();
+        $hours_content_array = $this->contents();
+        $languages = Language::get_all_languages();
+        $contents = Content::get_all_contents();
+        // dd($languages);
+        // dd($contents);
+        if(Auth::user()->admin_bool==1){
+            return view('webapp', compact('all_users','languages', 'contents', 'study_data', 'hours_today', 'hours_month', 'hours_total', 'bargraph_data', 'calender_month', 'week_number', 'hours_language_array', 'hours_content_array'));
+        }else{
+            return view('webapp', compact('languages', 'contents', 'study_data', 'hours_today', 'hours_month', 'hours_total', 'bargraph_data', 'calender_month', 'week_number', 'hours_language_array', 'hours_content_array'));
+        }
     }
-    public function getWeekNo($y,$m,$d){
+    public function post(Request $request)
+    {
+        // dd($request);
+        $validator = Validator::make($request->all(), [
+            'date' => 'required',
+            'hours' => 'integer | required',
+            'languages' => 'required',
+            'contents' => 'required'
+        ]);
+        if ($validator->fails()) {
+            return redirect()->to(app('url'))->previous()
+                ->withErrors($validator)
+                ->withInput();
+        } else {
+            return redirect()->to(app('url')->previous());
+        }
+        $content_count = count($request->contents);
+        $language_count = count($request->languages);
+        foreach ($request->contents as $content) {
+            foreach ($request->languages as $language) {
+                $study_data = new StudyData;
+                $study_data->user_id = session()->get('user')->id;
+                $study_data->language_id = $language;
+                $study_data->content_id = $content;
+                $study_data->hours = $request->hours / ($content_count * $language_count);
+                $study_data->posted_at = $request->date;
+                $study_data->save();
+            }
+        }
+        return redirect()->to(app('url')->previous());
+    }
+    public function getWeekNo($y, $m, $d)
+    {
         // 曜日。フルスペル形式。SundayからSaturday
-        $l = date("l",mktime(0,0,0,$m,$d,$y));
+        $l = date("l", mktime(0, 0, 0, $m, $d, $y));
         // 月。フルスペルの文字。January から December
-        $f = date("F",mktime(0,0,0,$m,$d,$y));
+        $f = date("F", mktime(0, 0, 0, $m, $d, $y));
         // 例えば date("j",strtotime("first Sunday of June 2019")) は 2
-        if(date("j",strtotime("first  {$l} of {$f} {$y}"))==$d) return 1;
-        if(date("j",strtotime("second {$l} of {$f} {$y}"))==$d) return 2;
-        if(date("j",strtotime("third  {$l} of {$f} {$y}"))==$d) return 3;
-        if(date("j",strtotime("fourth {$l} of {$f} {$y}"))==$d) return 4;
-        if(date("j",strtotime("fifth  {$l} of {$f} {$y}"))==$d) return 5;
+        if (date("j", strtotime("first  {$l} of {$f} {$y}")) == $d) return 1;
+        if (date("j", strtotime("second {$l} of {$f} {$y}")) == $d) return 2;
+        if (date("j", strtotime("third  {$l} of {$f} {$y}")) == $d) return 3;
+        if (date("j", strtotime("fourth {$l} of {$f} {$y}")) == $d) return 4;
+        if (date("j", strtotime("fifth  {$l} of {$f} {$y}")) == $d) return 5;
         return false;
-    }    
+    }
     public function hours_today()
     {
-        $study_data_today = StudyData::getData(session()->get('user')->id)->whereDate('posted_at',Carbon::today())->get();
-        $hours=0;
-        foreach($study_data_today as $data){
-            $hours=$hours+$data->hours;
+        $study_data_today = StudyData::getData(session()->get('user')->id)->whereDate('posted_at', Carbon::today())->get();
+        $hours = 0;
+        foreach ($study_data_today as $data) {
+            $hours = $hours + $data->hours;
         }
         return $hours;
     }
-    public function hours_month($year,$month){
-        $study_data_month=StudyData::getData(session()->get('user')->id)->whereYear('posted_at',$year)->whereMonth('posted_at',$month)->get();
-        $hours=0;
-        foreach($study_data_month as $data){
-            $hours=$hours+$data->hours;
+    public function hours_month($year, $month)
+    {
+        $study_data_month = StudyData::getData(session()->get('user')->id)->whereYear('posted_at', $year)->whereMonth('posted_at', $month)->get();
+        $hours = 0;
+        foreach ($study_data_month as $data) {
+            $hours = $hours + $data->hours;
         }
         return $hours;
     }
-    public function hours_total(){
+    public function hours_total()
+    {
         $study_data_total = StudyData::getData(session()->get('user')->id)->get();
-        $hours=0;
-        foreach($study_data_total as $data){
-            $hours=$hours+$data->hours;
+        $hours = 0;
+        foreach ($study_data_total as $data) {
+            $hours = $hours + $data->hours;
         }
         return $hours;
     }
-    public function bargraph_data($year,$month){
+    public function bargraph_data($year, $month)
+    {
         //carbonで月の初日+月の日数をforで回して
-        $study_data_array=[];
-        for($day=1;$day<=date('t',strtotime($year.'-'.$month.'-'.'01'));$day++){
-            $study_data_day=StudyData::getData(session()->get('user')->id)->whereDate('posted_at',$year.'-'.$month.'-'.$this->double($day))->get();
-            $count_study_data_day=$study_data_day->count();
-            if($count_study_data_day==0){
-                $study_data_array=$study_data_array+array($day=>0);
-            }else{
-                $hours=0;
-                foreach($study_data_day as $data){
-                    $hours+=$data->hours;
+        $study_data_array = [];
+        for ($day = 1; $day <= date('t', strtotime($year . '-' . $month . '-' . '01')); $day++) {
+            $study_data_day = StudyData::getData(session()->get('user')->id)->whereDate('posted_at', $year . '-' . $month . '-' . $this->double($day))->get();
+            $count_study_data_day = $study_data_day->count();
+            if ($count_study_data_day == 0) {
+                $study_data_array = $study_data_array + array($day => 0);
+            } else {
+                $hours = 0;
+                foreach ($study_data_day as $data) {
+                    $hours += $data->hours;
                 }
-                $study_data_array=$study_data_array+array($day=>$hours);
+                $study_data_array = $study_data_array + array($day => $hours);
             }
         }
         return $study_data_array;
@@ -113,46 +159,49 @@ class WebappController extends Controller
         }
         return $event;
     }
-    public function month(Request $request){
-        session(['year'=>$request->year]);
-        session(['month'=>$this->double($request->month)]);
+    public function month(Request $request)
+    {
+        session(['year' => $request->year]);
+        session(['month' => $this->double($request->month)]);
         return redirect('/webapp');
     }
-    public function languages(){
-        $language=Language::get();
-        $language_number=$language->count();
-        $study_data=StudyData::getData(session()->get('user')->id);
-        $hours_language_array=[];
-        for($language_index=1;$language_index<=$language_number;$language_index++){
-            $language_name=$language->find($language_index)->language;
-            $language_color=$language->find($language_index)->color_code;
-            $hours_language=$study_data->get();
-            $hours=0;
-            foreach($hours_language as $data){
-                if($data->language_id==$language_index){
-                    $hours+=$data->hours;
+    public function languages()
+    {
+        $language = Language::get();
+        $language_number = $language->count();
+        $study_data = StudyData::getData(session()->get('user')->id);
+        $hours_language_array = [];
+        for ($language_index = 1; $language_index <= $language_number; $language_index++) {
+            $language_name = $language->find($language_index)->language;
+            $language_color = $language->find($language_index)->color_code;
+            $hours_language = $study_data->get();
+            $hours = 0;
+            foreach ($hours_language as $data) {
+                if ($data->language_id == $language_index) {
+                    $hours += $data->hours;
                 }
             }
-            $hours_language_array[]=array('hours'=>$hours,'color_code'=>$language_color,'language_name'=>$language_name);
+            $hours_language_array[] = array('hours' => $hours, 'color_code' => $language_color, 'language_name' => $language_name);
         }
         return $hours_language_array;
     }
-    public function contents(){
-        $content=Content::get();
-        $content_number=$content->count();
-        $study_data=StudyData::getData(session()->get('user')->id);
-        $hours_content_array=[];
-        for($content_index=1;$content_index<=$content_number;$content_index++){
-            $content_name=$content->find($content_index)->content;
-            $content_color=$content->find($content_index)->color_code;
-            $hours_content=$study_data->get();
-            $hours=0;
-            foreach($hours_content as $data){
-                if($data->content_id==$content_index){
-                    $hours+=$data->hours;
+    public function contents()
+    {
+        $content = Content::get();
+        $content_number = $content->count();
+        $study_data = StudyData::getData(session()->get('user')->id);
+        $hours_content_array = [];
+        for ($content_index = 1; $content_index <= $content_number; $content_index++) {
+            $content_name = $content->find($content_index)->content;
+            $content_color = $content->find($content_index)->color_code;
+            $hours_content = $study_data->get();
+            $hours = 0;
+            foreach ($hours_content as $data) {
+                if ($data->content_id == $content_index) {
+                    $hours += $data->hours;
                 }
             }
-            $hours_content_array[]=array('hours'=>$hours,'color_code'=>$content_color,'content_name'=>$content_name);
+            $hours_content_array[] = array('hours' => $hours, 'color_code' => $content_color, 'content_name' => $content_name);
         }
         return $hours_content_array;
     }

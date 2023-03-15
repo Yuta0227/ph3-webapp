@@ -23,7 +23,10 @@
         <select name="buttons" class="button-container">
             <option id="header-logout-button" class="post-button">ログアウト</option>
             <option id="header-delete-button" class="post-button">削除依頼</option>
-            <option id="header-post-button" class="post-button">記録・投稿</option> 
+            <option id="header-post-button" class="post-button">記録・投稿</option>
+            @if(Auth::user()->admin_bool==1)
+            <option id="header-manage-user-button" class="post-button">ユーザー管理</option>
+            @endif
         </select>
         <div style="align-items:center;display:flex;justify-content:center;padding-right:20px;">
             <input type="button" value="確定" id="decide-button">
@@ -187,8 +190,10 @@
                     </div>
                 </div>
             </form>
-            <form id="post-form" hidden action="" method="POST">
-                <div class="form">
+            <form id="post-form" style="width:100%;height:100%;"name="postForm" hidden action="{{route('post')}}" method="POST" onsubmit="false">
+                @csrf
+                <div id="loading" style="width:100%;height:100%;text-align:center;background-color:red;" hidden>ローディング</div>
+                <div id="form-container" class="form">
                     <div class="form-direction">
                         <div class="form-left">
                             <div class="date-container">
@@ -198,86 +203,25 @@
                             </div>
                             <div class="study-content-container">
                                 <div>学習コンテンツ</div>
-                                <label id="label1">
-                                    <input id="checkbox1" name="contents[]" type="checkbox" value="3">
-                                    <i id="my-checkbox1" class="fas fa-check-circle"></i>
-                                    <span id="content-span1">
-                                        N予備校
-                                    </span>
-                                </label>
-                                <label id="label2">
-                                    <input id="checkbox2" name="contents[]" type="checkbox" value="2">
-                                    <i id="my-checkbox2" class="fas fa-check-circle"></i>
-                                    <span id="content-span2">
-                                        ドットインストール
-                                    </span>
-                                </label>
-                                <label id="label3">
-                                    <input id="checkbox3" name="contents[]" type="checkbox" value="1">
-                                    <i id="my-checkbox3" class="fas fa-check-circle"></i>
-                                    <span id="content-span3">
-                                        POSSE課題
-                                    </span>
-                                </label>
+                                @foreach($contents as $content)
+                                <div>
+                                    <label>
+                                    <input name="contents[]" type="checkbox" value="{{ $content->id }}">
+                                        {{ $content->content }}
+                                    </label>
+                                </div>
+                                @endforeach
                             </div>
                             <div class="language-container">
                                 <div>学習言語</div>
-                                <label id="label4">
-                                    <input id="checkbox4" type="checkbox" name="language" value="4">
-                                    <i id="my-checkbox4" class="fas fa-check-circle"></i>
-                                    <span id="language-span4">
-                                        HTML
-                                    </span>
-                                </label>
-                                <label id="label5">
-                                    <input id="checkbox5" type="checkbox" name="language" value="2">
-                                    <i id="my-checkbox5" class="fas fa-check-circle"></i>
-                                    <span id="language-span5">
-                                        CSS
-                                    </span>
-                                </label>
-                                <label id="label6">
-                                    <input id="checkbox6" type="checkbox" name="language" value="1">
-                                    <i id="my-checkbox6" class="fas fa-check-circle"></i>
-                                    <span id="language-span6">
-                                        Javascript
-                                    </span>
-                                </label>
-                                <label id="label7">
-                                    <input id="checkbox7" type="checkbox" name="language" value="3">
-                                    <i id="my-checkbox7" class="fas fa-check-circle"></i>
-                                    <span id="language-span7">
-                                        PHP
-                                    </span>
-                                </label>
-                                <label id="label8">
-                                    <input id="checkbox8" type="checkbox" name="language" value="5">
-                                    <i id="my-checkbox8" class="fas fa-check-circle"></i>
-                                    <span id="language-span8">
-                                        Laravel
-                                    </span>
-                                </label>
-                                <label id="label9">
-                                    <input id="checkbox9" type="checkbox" name="language" value="6">
-                                    <i id="my-checkbox9" class="fas fa-check-circle"></i>
-                                    <span id="language-span9">
-                                        SQL
-                                    </span>
-                                </label>
-                                <label id="label10">
-                                    <input id="checkbox10" type="checkbox" name="language" value="7">
-                                    <i id="my-checkbox10" class="fas fa-check-circle"></i>
-                                    <span id="language-span10">
-                                        SHELL
-                                    </span>
-                                </label>
-                                <label id="label11">
-                                    <input id="checkbox11" type="checkbox" name="language" value="8">
-                                    <i id="my-checkbox11" class="fas fa-check-circle"></i>
-                                    <span id="language-span11">
-                                        その他
-                                    </span>
-                                </label>
+                                @foreach($languages as $language)
+                                <div>
+                                    <label>
+                                    <input name="languages[]" type="checkbox" value="{{ $language->id }}">
+                                        {{ $language->language }}
+                                    </label>
+                                </div>
+                                @endforeach
                             </div>
                         </div>
                         <div class="form-right">
@@ -301,10 +245,27 @@
                         </div>
                     </div>
                     <div class="overlay-button-container">
-                        <input type="submit" value="記録・投稿" id="post-button" class="post-button"></input>
+                        <button type="button" value="記録・投稿" id="post-button" class="post-button">記録・投稿</button>
                     </div>
                 </div>
             </form>
+            @if(Auth::user()->admin_bool==1)
+            <form id="manage-user-form">
+                @foreach($all_users as $user)
+                {{$user}}
+                <div style="display:flex;">
+                    <div>{{$user->name}}</div>
+                    <div>{{$user->email}}</div>
+                    @if($user->admin_bool==1)
+                    <div>管理者</div>
+                    @else
+                    <div>一般ユーザー</div>
+                    @endif
+                    <form></form>
+                </div>
+                @endforeach
+            </form>
+            @endif
             <button id="exit" class="exit"><i class="fas fa-times"></i></button>
         </div>
     </div>

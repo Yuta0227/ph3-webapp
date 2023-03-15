@@ -19,6 +19,8 @@
             </div>
         </div>
     </div>
+    <div><a href="{{route('webapp')}}">webapp</a></div>
+
     <form action="/send_mail" method="POST">
         @csrf
         <label>宛先</label><select name="to">

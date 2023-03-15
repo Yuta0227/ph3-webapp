@@ -27,6 +27,7 @@ Auth::routes();
 
 Route::get('/home', 'HomeController@index')->name('home');
 Route::get('/webapp','WebappController@index')->name('webapp');
+Route::post('/webapp','WebappController@post')->name('post');
 Route::post('/logout','WebappController@logout')->name('logout');
 Route::post('/month','WebappController@month');
 Route::post('/send_mail',function(Request $request){
