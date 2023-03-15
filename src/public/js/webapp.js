@@ -1,7 +1,7 @@
 const headerLogoutButton = document.getElementById('header-logout-button');
-const headerDeleteButton = document.getElementById('header-delete-button');
+// const headerDeleteButton = document.getElementById('header-delete-button');
 const headerPostButton = document.getElementById('header-post-button');
-const headerManageUserButton = document.getElementById('header-manage-user-button');
+// const headerManageUserButton = document.getElementById('header-manage-user-button');
 const decideButton = document.getElementById('decide-button');
 const smartphonePostButton = document.getElementById('smartphone-post-button');
 const fullOverlay = document.getElementById('fullOverlay');
@@ -13,7 +13,7 @@ const animationFilter = document.getElementById('animation-filter');
 const animationText = document.getElementById('animation-text')
 const logoutForm = document.getElementById('logout-form');
 const postForm=document.getElementById('post-form');
-const manageUserForm=document.getElementById('manage-user-form');
+// const manageUserForm=document.getElementById('manage-user-form');
 var now = new Date();
 var chosenDate;
 var chosenMonth;
@@ -52,11 +52,10 @@ async function submitForm(){
     const response=await fetch(document.postForm.action , {
         method: "POST",
         body: new FormData(document.postForm)
-      });
+    });
     await new Promise(resolve => setTimeout(resolve, 3000));
     // document.getElementById('loading').setAttribute('hidden','');
     // document.getElementById('form-container').removeAttribute('hidden');
-    console.log(response);
     if(response.status==200){
         document.getElementById('loading').innerHTML='投稿完了';
     }else{
@@ -81,14 +80,11 @@ decideButton.addEventListener('click', function () {
     if (headerLogoutButton.selected == true) {
         logoutForm.removeAttribute('hidden');
     }
-    if (headerDeleteButton.selected == true) {
-        deleteForm.removeAttribute('hidden');
-    }
+    // if (headerDeleteButton.selected == true) {
+    //     deleteForm.removeAttribute('hidden');
+    // }
     if (headerPostButton.selected == true) {
         postForm.removeAttribute('hidden');
-    }
-    if(headerManageUserButton.selected==true){
-        manageUserForm.removeAttribute('hidden');
     }
 });
 //×ボタン押すとオーバーレイが消えると同時に入力内容リセットされる
@@ -123,15 +119,15 @@ function stopLoading() {
     fullOverlay.setAttribute("hidden", "");
     reset();
 };
-function reset() {
-    for (let i = 1; i <= 12; i++) {
-        if (document.getElementById(`checkbox${i}`).checked) {
-            document.getElementById(`my-checkbox${i}`).style.color = "black";
-            document.getElementById(`label${i}`).style.backgroundColor = "rgb(215,215,215)"
-            document.getElementById(`checkbox${i}`).checked = false;
-        }
-    }
-};
+// function reset() {
+//     for (let i = 1; i <= 12; i++) {
+//         if (document.getElementById(`checkbox${i}`).checked) {
+//             document.getElementById(`my-checkbox${i}`).style.color = "black";
+//             document.getElementById(`label${i}`).style.backgroundColor = "rgb(215,215,215)"
+//             document.getElementById(`checkbox${i}`).checked = false;
+//         }
+//     }
+// };
 pcPost.addEventListener('click', function () {
     if (time.innerHTML != '') {
         startLoading();

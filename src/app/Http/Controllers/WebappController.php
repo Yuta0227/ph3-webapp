@@ -15,18 +15,16 @@ class WebappController extends Controller
 {
     public function index()
     {
-        if (session()->get('user') == null) {
+        if (!Auth::user()) {
             return redirect('/login');
         }
-        if(Auth::user()->admin_bool==1){
-            $all_users=User::get();
-        }
-        $year = session()->get('year');
-        $month = session()->get('month');
+        $year = Carbon::now()->format('Y');
+        $month = Carbon::now()->format('m');
+        $date = Carbon::now()->format('d');
         list($y, $m, $d) = explode('-', date('Y-n-j'));
         $week_number = $this->getWeekNo($y, $m, $d);
         $calender_month = $this->single($month);
-        $study_data = StudyData::getData(session()->get('user')->id)->get();
+        $study_data = StudyData::getData(Auth::id())->get();
         $hours_today = $this->hours_today();
         $hours_month = $this->hours_month($year, $month);
         $hours_total = $this->hours_total();
@@ -35,17 +33,10 @@ class WebappController extends Controller
         $hours_content_array = $this->contents();
         $languages = Language::get_all_languages();
         $contents = Content::get_all_contents();
-        // dd($languages);
-        // dd($contents);
-        if(Auth::user()->admin_bool==1){
-            return view('webapp', compact('all_users','languages', 'contents', 'study_data', 'hours_today', 'hours_month', 'hours_total', 'bargraph_data', 'calender_month', 'week_number', 'hours_language_array', 'hours_content_array'));
-        }else{
-            return view('webapp', compact('languages', 'contents', 'study_data', 'hours_today', 'hours_month', 'hours_total', 'bargraph_data', 'calender_month', 'week_number', 'hours_language_array', 'hours_content_array'));
-        }
+        return view('webapp', compact('date','month','year','languages', 'contents', 'study_data', 'hours_today', 'hours_month', 'hours_total', 'bargraph_data', 'calender_month', 'week_number', 'hours_language_array', 'hours_content_array'));
     }
     public function post(Request $request)
     {
-        // dd($request);
         $validator = Validator::make($request->all(), [
             'date' => 'required',
             'hours' => 'integer | required',
@@ -53,18 +44,14 @@ class WebappController extends Controller
             'contents' => 'required'
         ]);
         if ($validator->fails()) {
-            return redirect()->to(app('url'))->previous()
-                ->withErrors($validator)
-                ->withInput();
-        } else {
-            return redirect()->to(app('url')->previous());
+            return response("failed", 500);
         }
         $content_count = count($request->contents);
         $language_count = count($request->languages);
         foreach ($request->contents as $content) {
             foreach ($request->languages as $language) {
                 $study_data = new StudyData;
-                $study_data->user_id = session()->get('user')->id;
+                $study_data->user_id = Auth::id();
                 $study_data->language_id = $language;
                 $study_data->content_id = $content;
                 $study_data->hours = $request->hours / ($content_count * $language_count);
@@ -72,7 +59,7 @@ class WebappController extends Controller
                 $study_data->save();
             }
         }
-        return redirect()->to(app('url')->previous());
+        return response("success", 200);
     }
     public function getWeekNo($y, $m, $d)
     {
@@ -90,7 +77,7 @@ class WebappController extends Controller
     }
     public function hours_today()
     {
-        $study_data_today = StudyData::getData(session()->get('user')->id)->whereDate('posted_at', Carbon::today())->get();
+        $study_data_today = StudyData::getData(Auth::id())->whereDate('posted_at', Carbon::today())->get();
         $hours = 0;
         foreach ($study_data_today as $data) {
             $hours = $hours + $data->hours;
@@ -99,7 +86,7 @@ class WebappController extends Controller
     }
     public function hours_month($year, $month)
     {
-        $study_data_month = StudyData::getData(session()->get('user')->id)->whereYear('posted_at', $year)->whereMonth('posted_at', $month)->get();
+        $study_data_month = StudyData::getData(Auth::id())->whereYear('posted_at', $year)->whereMonth('posted_at', $month)->get();
         $hours = 0;
         foreach ($study_data_month as $data) {
             $hours = $hours + $data->hours;
@@ -108,7 +95,7 @@ class WebappController extends Controller
     }
     public function hours_total()
     {
-        $study_data_total = StudyData::getData(session()->get('user')->id)->get();
+        $study_data_total = StudyData::getData(Auth::id())->get();
         $hours = 0;
         foreach ($study_data_total as $data) {
             $hours = $hours + $data->hours;
@@ -120,7 +107,7 @@ class WebappController extends Controller
         //carbonで月の初日+月の日数をforで回して
         $study_data_array = [];
         for ($day = 1; $day <= date('t', strtotime($year . '-' . $month . '-' . '01')); $day++) {
-            $study_data_day = StudyData::getData(session()->get('user')->id)->whereDate('posted_at', $year . '-' . $month . '-' . $this->double($day))->get();
+            $study_data_day = StudyData::getData(Auth::id())->whereDate('posted_at', $year . '-' . $month . '-' . $this->double($day))->get();
             $count_study_data_day = $study_data_day->count();
             if ($count_study_data_day == 0) {
                 $study_data_array = $study_data_array + array($day => 0);
@@ -134,12 +121,12 @@ class WebappController extends Controller
         }
         return $study_data_array;
     }
-    public function logout()
-    {
-        session()->forget('user');
-        Auth::logout();
-        return redirect('/');
-    }
+    // public function logout()
+    // {
+    //     session()->forget('user');
+    //     Auth::logout();
+    //     return redirect('/login');
+    // }
     public function single($event)
     {
         for ($i = 1; $i <= 9; $i++) {
@@ -167,41 +154,25 @@ class WebappController extends Controller
     }
     public function languages()
     {
-        $language = Language::get();
-        $language_number = $language->count();
-        $study_data = StudyData::getData(session()->get('user')->id);
-        $hours_language_array = [];
-        for ($language_index = 1; $language_index <= $language_number; $language_index++) {
-            $language_name = $language->find($language_index)->language;
-            $language_color = $language->find($language_index)->color_code;
-            $hours_language = $study_data->get();
-            $hours = 0;
-            foreach ($hours_language as $data) {
-                if ($data->language_id == $language_index) {
-                    $hours += $data->hours;
-                }
-            }
-            $hours_language_array[] = array('hours' => $hours, 'color_code' => $language_color, 'language_name' => $language_name);
+        $hours_language=Language::withTrashed()->with('study_datas')->whereHas('study_datas',function($query){
+            $query->where('user_id','=',Auth::id());
+        })->get();
+        $hours_language_array=[];
+        foreach($hours_language as $language){
+            $total_hours_per_language=$language->study_datas->sum('hours');
+            $hours_language_array[]=['hours'=>$total_hours_per_language,'color_code'=>$language->color_code,'language_name'=>$language->language];
         }
         return $hours_language_array;
     }
     public function contents()
     {
-        $content = Content::get();
-        $content_number = $content->count();
-        $study_data = StudyData::getData(session()->get('user')->id);
-        $hours_content_array = [];
-        for ($content_index = 1; $content_index <= $content_number; $content_index++) {
-            $content_name = $content->find($content_index)->content;
-            $content_color = $content->find($content_index)->color_code;
-            $hours_content = $study_data->get();
-            $hours = 0;
-            foreach ($hours_content as $data) {
-                if ($data->content_id == $content_index) {
-                    $hours += $data->hours;
-                }
-            }
-            $hours_content_array[] = array('hours' => $hours, 'color_code' => $content_color, 'content_name' => $content_name);
+        $hours_content=Content::withTrashed()->with('study_datas')->whereHas('study_datas',function($query){
+            $query->where('user_id','=',Auth::id());
+        })->get();
+        $hours_content_array=[];
+        foreach($hours_content as $content){
+            $total_hours_per_content=$content->study_datas->sum('hours');
+            $hours_content_array[]=['hours'=>$total_hours_per_content,'color_code'=>$content->color_code,'content_name'=>$content->content];
         }
         return $hours_content_array;
     }

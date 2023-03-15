@@ -10,4 +10,10 @@ class StudyData extends Model
     public static function getData($user_id){
         return self::where('user_id',$user_id);
     }
+    public function content(){
+        return $this->belongsTo(Content::class);
+    }
+    public function language(){
+        return $this->belongsTo(Language::class);
+    }
 }

@@ -32,12 +32,13 @@ class HomeController extends Controller
         session(['user'=>$user]);
         session(['year'=>date('Y')]);
         session(['month'=>date('m')]);
-        if($user->admin_bool==1){
-            $users_list=User::where('admin_bool',0)->get();
-            return view('home',compact('user','users_list'));
-        }else{
+        // if($user->admin_bool==1){
+            // if(Auth::user()->admin_bool!==1){
+            //     return redirect()->to(app('url'))->previous()
+            //         ->withErrors('一般ユーザーは帰れ');
+            // } 
             return redirect()->action('WebappController@index');
-        }
+        // }
     }
     public function send_mail(Request $request){
         Mail::from($_ENV['MAIL_FROM_ADDRESS'])->to($request->to)->send(new Webapp());

@@ -14,10 +14,10 @@ class Contents extends Migration
     public function up()
     {
         Schema::create('contents',function(Blueprint $table){
-            $table->integer('id');
+            $table->bigIncrements('id');
             $table->string('content');
             $table->string('color_code');
-            $table->primary('id');
+            $table->softDeletes('deleted_at',0);
         });
     }
 

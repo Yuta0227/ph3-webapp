@@ -14,13 +14,14 @@ class StudyDataTable extends Migration
     public function up()
     {
         Schema::create('study_data', function (Blueprint $table) {
-            $table->bigIncrements('data_id');
-            $table->integer('user_id');
-            $table->integer('content_id');
-            $table->integer('language_id');
+            $table->bigIncrements('id');
+            $table->unsignedBigInteger('user_id');
+            $table->foreign('user_id')->references('id')->on('users');
             $table->integer('hours');
             $table->datetime('posted_at');
+            $table->unsignedBigInteger('content_id');
             $table->foreign('content_id')->references('id')->on('contents');
+            $table->unsignedBigInteger('language_id');
             $table->foreign('language_id')->references('id')->on('languages');
         });
     }

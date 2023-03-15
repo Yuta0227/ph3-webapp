@@ -17,17 +17,20 @@
     <header>
         <div class="logo-week">
             <img src="./img/posse_logo.png" alt="posseのロゴ" class="logo">
-            <span class="week">{{ $week_number . '週目の' . session()->get('user')->name . 'さんの勉強時間' }}
+            <span class="week">{{ $week_number . '週目の' . Auth::user()->name . 'さんの勉強時間' }}
             </span>
         </div>
+        @if(session('error'))
+        <div>{{session('error')}}</div>
+        @endif
         <select name="buttons" class="button-container">
             <option id="header-logout-button" class="post-button">ログアウト</option>
-            <option id="header-delete-button" class="post-button">削除依頼</option>
+            <!-- <option id="header-delete-button" class="post-button">削除依頼</option> -->
             <option id="header-post-button" class="post-button">記録・投稿</option>
-            @if(Auth::user()->admin_bool==1)
-            <option id="header-manage-user-button" class="post-button">ユーザー管理</option>
-            @endif
         </select>
+        @if(Auth::user()->admin_bool===1)
+        <a href="{{route('admin')}}">管理者画面</a>
+        @endif
         <div style="align-items:center;display:flex;justify-content:center;padding-right:20px;">
             <input type="button" value="確定" id="decide-button">
         </div>
@@ -38,14 +41,14 @@
             <div class="today-month-total-container">
                 <div class="today-container">
                     <div class="today">
-                        {{ session()->get('year') }}/{{ session()->get('month') }}/{{ date('d') }}</div>
+                        {{ $year }}/{{ $month }}/{{ $date }}</div>
                     <div class="number">
                         {{ $hours_today }}
                     </div>
                     <div class="hour">時間</div>
                 </div>
                 <div class="month-container">
-                    <div class="month">{{ session()->get('year') . '/' . session()->get('month') }}
+                    <div class="month">{{ $year . '/' . $month }}
                     </div>
                     <div class="number">
                         {{ $hours_month }}
@@ -249,23 +252,6 @@
                     </div>
                 </div>
             </form>
-            @if(Auth::user()->admin_bool==1)
-            <form id="manage-user-form">
-                @foreach($all_users as $user)
-                {{$user}}
-                <div style="display:flex;">
-                    <div>{{$user->name}}</div>
-                    <div>{{$user->email}}</div>
-                    @if($user->admin_bool==1)
-                    <div>管理者</div>
-                    @else
-                    <div>一般ユーザー</div>
-                    @endif
-                    <form></form>
-                </div>
-                @endforeach
-            </form>
-            @endif
             <button id="exit" class="exit"><i class="fas fa-times"></i></button>
         </div>
     </div>
