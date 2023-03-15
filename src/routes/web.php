@@ -11,6 +11,11 @@
 |
 */
 
+use App\Mail\Webapp;
+use App\User;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/', function () {
@@ -21,3 +26,11 @@ Route::get('/', function () {
 Auth::routes();
 
 Route::get('/home', 'HomeController@index')->name('home');
+Route::get('/webapp','WebappController@index')->name('webapp');
+Route::post('/logout','WebappController@logout')->name('logout');
+Route::post('/month','WebappController@month');
+Route::post('/send_mail',function(Request $request){
+    $user=User::where('email',$request->to)->get();
+    Mail::to($request->to)->send(new Webapp($request->to,$user->first()->name,$request->title,$request->message));
+    return redirect('/home');
+});
