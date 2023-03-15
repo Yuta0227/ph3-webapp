@@ -251,7 +251,7 @@ tr,th,td{
 }
 /* 中途半端な位置で折り返さない */
 .form-left>div>label{
-    white-space:nowrap;
+    /* white-space:nowrap; */
     background-color:rgb(215,215,215);
     border-radius:10px;
     margin:0 8px 8px 0;
@@ -266,7 +266,7 @@ tr,th,td{
 }
 /* デフォルトのチェックマーク消してる */
 .form-left>div>label>input, .form-right>div>label>input{
-    display:none;
+    /* display:none; */
 }
 .color-blue{
     color:blue;

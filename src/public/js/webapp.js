@@ -1,6 +1,7 @@
 const headerLogoutButton = document.getElementById('header-logout-button');
 const headerDeleteButton = document.getElementById('header-delete-button');
 const headerPostButton = document.getElementById('header-post-button');
+const headerManageUserButton = document.getElementById('header-manage-user-button');
 const decideButton = document.getElementById('decide-button');
 const smartphonePostButton = document.getElementById('smartphone-post-button');
 const fullOverlay = document.getElementById('fullOverlay');
@@ -12,6 +13,7 @@ const animationFilter = document.getElementById('animation-filter');
 const animationText = document.getElementById('animation-text')
 const logoutForm = document.getElementById('logout-form');
 const postForm=document.getElementById('post-form');
+const manageUserForm=document.getElementById('manage-user-form');
 var now = new Date();
 var chosenDate;
 var chosenMonth;
@@ -24,25 +26,48 @@ var writtenComment;
 var boolShare;
 var tmp;
 //ラベルクリック時checked==trueならば青色をつける
-for (let i = 1; i <= 11; i++) {
-    document.getElementById(`label${i}`).addEventListener('click', function () {
-        if (i >= 4 && i <= 11 && document.getElementById(`checkbox${i}`).checked == false) {
-            for (let tmp = 4; tmp <= 11; tmp++) {
-                //言語は一つしか選べないように
-                document.getElementById(`checkbox${tmp}`).checked = false;
-                document.getElementById(`my-checkbox${tmp}`).style.color = "black";
-                document.getElementById(`label${tmp}`).style.backgroundColor = "rgb(215,215,215)";
-            }
-        }
-        if (document.getElementById(`checkbox${i}`).checked == false) {
-            document.getElementById(`my-checkbox${i}`).style.color = 'black';
-            document.getElementById(`label${i}`).style.backgroundColor = "rgb(215,215,215)";
-        } else if (document.getElementById(`checkbox${i}`).checked == true) {
-            document.getElementById(`my-checkbox${i}`).style.color = "blue";
-            document.getElementById(`label${i}`).style.backgroundColor = "#e7f5ff";
-        }
-    })
-};
+// for (let i = 1; i <= 11; i++) {
+//     document.getElementById(`label${i}`).addEventListener('click', function () {
+//         if (i >= 4 && i <= 11 && document.getElementById(`checkbox${i}`).checked == false) {
+//             for (let tmp = 4; tmp <= 11; tmp++) {
+//                 //言語は一つしか選べないように
+//                 // document.getElementById(`checkbox${tmp}`).checked = false;
+//                 // document.getElementById(`my-checkbox${tmp}`).style.color = "black";
+//                 // document.getElementById(`label${tmp}`).style.backgroundColor = "rgb(215,215,215)";
+//             }
+//         }
+//         if (document.getElementById(`checkbox${i}`).checked == false) {
+//             document.getElementById(`my-checkbox${i}`).style.color = 'black';
+//             document.getElementById(`label${i}`).style.backgroundColor = "rgb(215,215,215)";
+//         } else if (document.getElementById(`checkbox${i}`).checked == true) {
+//             document.getElementById(`my-checkbox${i}`).style.color = "blue";
+//             document.getElementById(`label${i}`).style.backgroundColor = "#e7f5ff";
+//         }
+//     })
+// };
+async function submitForm(){
+    console.log('loading');
+    document.getElementById('loading').removeAttribute('hidden');
+    document.getElementById('form-container').setAttribute('hidden','');
+    const response=await fetch(document.postForm.action , {
+        method: "POST",
+        body: new FormData(document.postForm)
+      });
+    await new Promise(resolve => setTimeout(resolve, 3000));
+    // document.getElementById('loading').setAttribute('hidden','');
+    // document.getElementById('form-container').removeAttribute('hidden');
+    console.log(response);
+    if(response.status==200){
+        document.getElementById('loading').innerHTML='投稿完了';
+    }else{
+        document.getElementById('loading').innerHTML='投稿失敗';
+    }
+    location.reload();
+}
+document.getElementById('post-button').addEventListener('click',function(e){
+    // e.preventDefault();
+    submitForm();
+})
 document.getElementById(`label12`).addEventListener('click', function () {
     if (document.getElementById(`checkbox12`).checked == true) {
         document.getElementById(`my-checkbox12`).style.color = "blue";
@@ -61,6 +86,9 @@ decideButton.addEventListener('click', function () {
     }
     if (headerPostButton.selected == true) {
         postForm.removeAttribute('hidden');
+    }
+    if(headerManageUserButton.selected==true){
+        manageUserForm.removeAttribute('hidden');
     }
 });
 //×ボタン押すとオーバーレイが消えると同時に入力内容リセットされる
